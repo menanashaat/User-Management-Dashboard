@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import UserList from './components/UserList.vue'
+import HomeView from "@/views/HomeView.vue";
 </script>
 
 <template>
-  <UserList  />
+  <HomeView />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
