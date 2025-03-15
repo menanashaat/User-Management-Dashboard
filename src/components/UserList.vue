@@ -9,7 +9,6 @@
                 :title="t('teamMembersTitle')"
                 :description="t('teamMembersDescription')"
               />
-              <LanguageSwitcher />
             </div>
           </template>
 

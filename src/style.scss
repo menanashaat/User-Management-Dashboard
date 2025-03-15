@@ -1,0 +1,108 @@
+// Define theme variables
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --primary-color: #409eff;
+  --border-color: #dcdfe6;
+}
+
+[data-theme="dark"] {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+  --primary-color: #409eff;
+  --border-color: #4c4c4c;
+}
+
+// Mixin for dark theme styles
+@mixin dark-theme {
+  background-color: var(--background-color);
+  color: var(--text-color);
+
+  .el-card {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+  }
+
+  .el-table {
+    background-color: var(--background-color);
+    color: var(--text-color);
+
+    th,
+    td {
+      background-color: var(--background-color);
+      border-color: var(--border-color);
+    }
+  }
+
+  .el-descriptions__cell {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .el-descriptions__content,
+  .el-descriptions__title , .el-switch__label{
+    color: var(--text-color);
+  }
+
+  .el-input,
+  .el-select {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+}
+
+// Mixin for RTL styles
+@mixin rtl-layout {
+  text-align: right;
+  direction: rtl;
+
+  .el-input,
+  .el-select,
+  .el-button,
+  .el-table {
+    text-align: right;
+  }
+
+  .el-pagination {
+    direction: ltr; // Keep pagination controls LTR
+  }
+
+  .el-table th {
+    text-align: right;
+  }
+
+  .el-col-offset-2 {
+    margin-right: 8.3333333333%;
+  }
+
+  .el-descriptions__content {
+    text-align: right;
+  }
+
+  .el-button + .el-button {
+    margin-right: 12px;
+  }
+
+  .el-table .el-table__cell {
+    text-align: right;
+  }
+}
+
+// Apply dark theme
+[data-theme="dark"] {
+  @include dark-theme;
+}
+
+// Apply RTL layout
+[dir="rtl"] {
+  @include rtl-layout;
+}
+
+// Additional global styles
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
