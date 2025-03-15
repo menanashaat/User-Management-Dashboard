@@ -22,11 +22,21 @@
         <el-table-column prop="dateJoined" label="Date Joined" sortable />
         <el-table-column label="Actions">
           <template #default="{ row }">
-            <el-button type="primary" @click="editUser(row.id)">Edit</el-button>
+            <el-button type="primary" @click="openEditModal(row)">Edit</el-button>
             <el-button type="danger" @click="deleteUser(row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+        <!-- Edit User Modal -->
+    <el-dialog v-model="isEditModalVisible" title="Edit User" width="30%">
+      <UserForm
+        v-if="selectedUser"
+        :user="selectedUser"
+        @submit="handleEditSubmit"
+        @cancel="closeEditModal"
+      />
+    </el-dialog>
   
       <el-pagination
         :current-page="currentPage"
@@ -41,7 +51,8 @@
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
   import { useUserStore } from '@/stores/userStore';
-  
+  import UserForm from '@/components/UserForm.vue'; // Import the UserForm component
+
   const userStore = useUserStore();
   const users = ref([]);
   const roles = ref([]);
@@ -53,6 +64,10 @@
   const currentPage = ref(1);
   const total = ref(0);
   const limit = 10;
+
+  const isEditModalVisible = ref(false); // Control modal visibility
+  const selectedUser = ref(null); // Store the selected user for editing
+
   
   onMounted(async () => {
     await userStore.fetchRoles();
@@ -66,10 +81,24 @@
     total.value = userStore.total;
   };
   
-  const editUser = (id: number) => {
-    // Navigate to the user detail view
-    console.log(`Editing user with ID: ${id}`);
-  };
+ // Open the edit modal and set the selected user
+const openEditModal = (user: any) => {
+  selectedUser.value = user;
+  isEditModalVisible.value = true;
+};
+
+// Close the edit modal
+const closeEditModal = () => {
+  isEditModalVisible.value = false;
+  selectedUser.value = null;
+};
+
+// Handle form submission
+const handleEditSubmit = async (updatedUser: any) => {
+  await userStore.updateUser(updatedUser); // Update the user in the store
+  closeEditModal(); // Close the modal
+  await fetchUsers(); // Refresh the user list
+};
   
   const deleteUser = (id: number) => {
     // Implement delete logic here

@@ -67,4 +67,14 @@ export const mockApi = {
     const paginatedUsers = filteredUsers.slice((page - 1) * limit, page * limit);
     return { data: paginatedUsers, total: filteredUsers.length };
   },
+  async updateUser(user: User): Promise<void> {
+    // Simulate API latency
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Find and update the user
+    const index = users.findIndex((u) => u.id === user.id);
+    if (index !== -1) {
+      users[index] = user; // Update the user in the mock data
+    }
+  },
 };

@@ -58,5 +58,19 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+    async updateUser(user: User) {
+      this.loading = true;
+      try {
+        await mockApi.updateUser(user); // Call the mock API to update the user
+        const index = this.users.findIndex((u) => u.id === user.id);
+        if (index !== -1) {
+          this.users[index] = user; // Update the user in the store
+        }
+      } catch (error) {
+        this.error = 'Failed to update user';
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
