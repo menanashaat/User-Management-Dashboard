@@ -77,4 +77,14 @@ export const mockApi = {
       users[index] = user; // Update the user in the mock data
     }
   },
+  async deleteUser(userId: number): Promise<void> {
+    // Simulate API latency
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Find and delete the user
+    const index = users.findIndex((u) => u.id === userId);
+    if (index !== -1) {
+      users.splice(index, 1); // Remove the user from the mock data
+    }
+  },
 };

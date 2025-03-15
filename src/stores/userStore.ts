@@ -72,5 +72,17 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+    async deleteUser(userId: number) {
+      this.loading = true;
+      try {
+        await mockApi.deleteUser(userId); // Call the mock API to delete the user
+        this.users = this.users.filter((u) => u.id !== userId); // Remove the user from the local state
+        this.total -= 1; // Update the total count
+      } catch (error) {
+        this.error = 'Failed to delete user';
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
