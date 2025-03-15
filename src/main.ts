@@ -5,6 +5,7 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import { ElButton, ElTable, ElPagination, ElForm, ElInput, ElSelect, ElOption } from 'element-plus';
 import { createPinia } from 'pinia'; // Import Pinia
+import {i18n} from './i18n'; // Import the i18n instance
 
 // Create the app instance
 const app = createApp(App);
@@ -14,6 +15,7 @@ const pinia = createPinia();
 
 // Use Pinia
 app.use(pinia);
+app.use(i18n); // Use the i18n instance
 
 // Use Element Plus
 app.use(ElementPlus);

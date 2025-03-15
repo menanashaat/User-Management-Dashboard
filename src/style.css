@@ -1,0 +1,31 @@
+[dir="rtl"] {
+    text-align: right; /* Align text to the right */
+    direction: rtl; /* Ensure content flows from right to left */
+  
+    .el-input,
+    .el-select,
+    .el-button,
+    .el-table {
+      text-align: right;
+    }
+  
+    .el-pagination {
+      direction: ltr; /* Keep pagination controls LTR */
+    }
+  
+    .el-table th {
+      text-align: right; /* Align table headers to the right */
+    }
+    .el-col-offset-2 {
+        margin-right: 8.3333333333%;
+    }
+    .el-descriptions__content{
+        text-align: right;
+    }
+    .el-button+.el-button {
+        margin-right: 12px;
+    }
+    .el-table .el-table__cell{
+        text-align: right;
+    }
+  }

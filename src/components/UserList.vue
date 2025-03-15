@@ -5,25 +5,26 @@
         <el-card shadow="never">
           <template #header>
             <div class="card-header">
-              <Title
-                title="Team Members"
-                description="Manage your team members and their account permissions here"
+              <Title 
+                :title="t('teamMembersTitle')"
+                :description="t('teamMembersDescription')"
               />
+              <LanguageSwitcher />
             </div>
           </template>
 
           <div class="user-list__filters">
             <el-input
               v-model="filters.name"
-              placeholder="Search by name"
+              :placeholder="t('searchByName')"
               clearable
             />
             <el-select
               v-model="filters.role"
-              placeholder="Select role"
+              :placeholder="t('selectRole')"
               clearable
             >
-              <el-option label="All Roles" value="" />
+              <el-option :label="t('allRoles')" value="" />
               <el-option
                 v-for="role in roles"
                 :key="role.id"
@@ -33,39 +34,39 @@
             </el-select>
             <el-select
               v-model="filters.status"
-              placeholder="Select status"
+              :placeholder="t('selectStatus')"
               clearable
             >
-              <el-option label="All Statuses" value="" />
-              <el-option label="Active" value="Active" />
-              <el-option label="Inactive" value="Inactive" />
+              <el-option :label="t('allStatuses')" value="" />
+              <el-option :label="t('active')" value="Active" />
+              <el-option :label="t('inactive')" value="Inactive" />
             </el-select>
-            <el-button type="primary" @click="fetchUsers"
-              >Apply Filters</el-button
-            >
+            <el-button type="primary" @click="fetchUsers">
+              {{ t('applyFilters') }}
+            </el-button>
           </div>
           <div class="user-list__table">
             <el-table :data="users" style="width: 100%">
-              <el-table-column prop="name" label="Name" sortable />
-              <el-table-column prop="email" label="Email" />
-              <el-table-column prop="role" label="Role" />
-              <el-table-column prop="status" label="Status" />
-              <el-table-column prop="dateJoined" label="Date Joined" sortable />
-              <el-table-column label="Actions">
+              <el-table-column :label="t('name')" prop="name" sortable />
+              <el-table-column :label="t('email')" prop="email" />
+              <el-table-column :label="t('role')" prop="role" />
+              <el-table-column :label="t('status')" prop="status" />
+              <el-table-column :label="t('dateJoined')" prop="dateJoined" sortable />
+              <el-table-column :label="t('actions')">
                 <template #default="{ row }">
-                  <el-button type="primary" @click="openEditModal(row)"
-                    >Edit</el-button
-                  >
-                  <el-button type="danger" @click="confirmDeleteHandler(row.id)"
-                    >Delete</el-button
-                  >
+                  <el-button type="primary" @click="openEditModal(row)">
+                    {{ t('editUser') }}
+                  </el-button>
+                  <el-button type="danger" @click="confirmDeleteHandler(row.id)">
+                    {{ t('delete') }}
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
 
           <!-- Edit User Modal -->
-          <el-dialog v-model="isEditModalVisible" title="Edit User" width="30%">
+          <el-dialog v-model="isEditModalVisible" :title="t('editUserModalTitle')" width="30%">
             <UserForm
               v-if="selectedUser"
               :user="selectedUser"
@@ -91,11 +92,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from 'vue-i18n'; // Import useI18n
 import { useUserStore } from "@/stores/userStore";
 import UserForm from "@/components/UserForm.vue"; // Import the UserForm component
 import Title from "@/components/Title.vue"; // Import the UserForm component
 import { useConfirmDelete } from "@/composables/useConfirmDelete"; // Import the composable
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from "element-plus";
+
+const { t } = useI18n(); // Use the Composition API
 
 const userStore = useUserStore();
 const users = ref([]);
