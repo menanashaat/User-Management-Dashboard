@@ -10,10 +10,9 @@
                 :description="t('teamMembersDescription')"
               />
               <div class="card-header__export">
-                <!-- <el-button type="primary" @click="exportToCSV">Export to CSV</el-button> -->
-                <el-button type="primary" @click="exportToPDF"
-                  >Export to PDF</el-button
-                >
+                <el-button type="primary" @click="exportToPDF">
+                  {{ t("ExportPDF") }}
+                </el-button>
               </div>
             </div>
           </template>
@@ -46,12 +45,9 @@
               <el-option :label="t('active')" value="Active" />
               <el-option :label="t('inactive')" value="Inactive" />
             </el-select>
-            <el-button type="primary" @click="fetchUsers">
-              {{ t("applyFilters") }}
-            </el-button>
           </div>
           <div class="user-list__table">
-            <el-table :data="users" style="width: 100%">
+            <el-table :data="filteredUsers" style="width: 100%">
               <el-table-column :label="t('name')" prop="name" sortable />
               <el-table-column :label="t('email')" prop="email" />
               <el-table-column :label="t('role')" prop="role" />
@@ -66,10 +62,7 @@
                   <el-button type="primary" @click="openEditModal(row)">
                     {{ t("editUser") }}
                   </el-button>
-                  <el-button
-                    type="danger"
-                    @click="confirmDeleteHandler(row.id)"
-                  >
+                  <el-button type="danger" @click="confirmDeleteHandler(row.id)">
                     {{ t("delete") }}
                   </el-button>
                 </template>
@@ -107,22 +100,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useI18n } from "vue-i18n"; // Import useI18n
+import { ref, onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/stores/userStore";
-import UserForm from "@/components/UserForm.vue"; // Import the UserForm component
-import Title from "@/components/Title.vue"; // Import the UserForm component
-import { useConfirmDelete } from "@/composables/useConfirmDelete"; // Import the composable
+import UserForm from "@/components/UserForm.vue";
+import Title from "@/components/Title.vue";
+import { useConfirmDelete } from "@/composables/useConfirmDelete";
 import { ElMessageBox, ElMessage } from "element-plus";
-
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable"; // Import autoTable directly
+import autoTable from "jspdf-autotable";
 
-const { t } = useI18n(); // Use the Composition API
+const { t } = useI18n();
 
 const userStore = useUserStore();
 const users = ref([]);
-const roles = ref([]);
+const roles = ref([
+  { id: 1, name: 'Admin' },
+  { id: 2, name: 'Manager' },
+  { id: 3, name: 'Editor' },
+  { id: 4, name: 'Viewer' },
+  { id: 5, name: 'Guest' },
+]);
 const filters = ref({
   name: "",
   role: "",
@@ -132,14 +130,14 @@ const currentPage = ref(1);
 const total = ref(0);
 const limit = 10;
 
-const isEditModalVisible = ref(false); // Control modal visibility
-const selectedUser = ref(null); // Store the selected user for editing
+const isEditModalVisible = ref(false);
+const selectedUser = ref(null);
 
-const { confirmDelete } = useConfirmDelete(); // Use the composable
+const { confirmDelete } = useConfirmDelete();
 
 onMounted(async () => {
   await userStore.fetchRoles();
-  roles.value = userStore.roles;
+  roles.value = userStore.roles; // If roles are fetched from the backend
   await fetchUsers();
 });
 
@@ -149,24 +147,38 @@ const fetchUsers = async () => {
   total.value = userStore.total;
 };
 
-// Open the edit modal and set the selected user
+// Computed property for filtered users
+const filteredUsers = computed(() => {
+  return users.value.filter((user) => {
+    const matchesName = user.name
+      .toLowerCase()
+      .includes(filters.value.name.toLowerCase());
+    const matchesRole = filters.value.role
+      ? user.role === filters.value.role
+      : true;
+    const matchesStatus = filters.value.status
+      ? user.status === filters.value.status
+      : true;
+
+    return matchesName && matchesRole && matchesStatus;
+  });
+});
+
 const openEditModal = (user: any) => {
   selectedUser.value = user;
   isEditModalVisible.value = true;
 };
 
-// Close the edit modal
 const closeEditModal = () => {
   isEditModalVisible.value = false;
   selectedUser.value = null;
 };
 
-// Handle form submission
 const handleEditSubmit = async (updatedUser: any) => {
-  await userStore.updateUser(updatedUser); // Update the user in the store
-  closeEditModal(); // Close the modal
+  await userStore.updateUser(updatedUser);
+  closeEditModal();
   ElMessage.success("User updated successfully");
-  await fetchUsers(); // Refresh the user list
+  await fetchUsers();
 };
 
 const handlePageChange = (page: number) => {
@@ -174,11 +186,11 @@ const handlePageChange = (page: number) => {
   fetchUsers();
 };
 
-// Delete Confirmation Dialog
 const deleteUser = async (userId: number) => {
   await userStore.deleteUser(userId);
-  await fetchUsers(); // Refresh the user list
+  await fetchUsers();
 };
+
 const confirmDeleteHandler = (userId: number) => {
   confirmDelete(async () => {
     await deleteUser(userId);
@@ -197,7 +209,7 @@ const exportToPDF = () => {
     { title: "Date Joined", dataKey: "dateJoined" },
   ];
 
-  const rows = users.value.map((user) => ({
+  const rows = filteredUsers.value.map((user) => ({
     name: user.name,
     email: user.email,
     role: user.role,

@@ -22,7 +22,8 @@ const messages = {
     "delete": "Delete",
     "editUserModalTitle": "Edit User",
     "userUpdatedSuccessfully": "User updated successfully",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "ExportPDF":"Export to PDF"
   },
   ar:{
     "teamMembersTitle": "أعضاء الفريق",
@@ -45,7 +46,8 @@ const messages = {
     "delete": "حذف",
     "editUserModalTitle": "تعديل المستخدم",
     "userUpdatedSuccessfully": "تم تحديث المستخدم بنجاح",
-    "pagination": "التنقل بين الصفحات"
+    "pagination": "التنقل بين الصفحات",
+    "ExportPDF":"تصدير إلى ملف"
   }
 };
 
