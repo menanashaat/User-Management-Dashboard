@@ -5,10 +5,16 @@
         <el-card shadow="never">
           <template #header>
             <div class="card-header">
-              <Title 
+              <Title
                 :title="t('teamMembersTitle')"
                 :description="t('teamMembersDescription')"
               />
+              <div class="card-header__export">
+                <!-- <el-button type="primary" @click="exportToCSV">Export to CSV</el-button> -->
+                <el-button type="primary" @click="exportToPDF"
+                  >Export to PDF</el-button
+                >
+              </div>
             </div>
           </template>
 
@@ -41,7 +47,7 @@
               <el-option :label="t('inactive')" value="Inactive" />
             </el-select>
             <el-button type="primary" @click="fetchUsers">
-              {{ t('applyFilters') }}
+              {{ t("applyFilters") }}
             </el-button>
           </div>
           <div class="user-list__table">
@@ -50,14 +56,21 @@
               <el-table-column :label="t('email')" prop="email" />
               <el-table-column :label="t('role')" prop="role" />
               <el-table-column :label="t('status')" prop="status" />
-              <el-table-column :label="t('dateJoined')" prop="dateJoined" sortable />
+              <el-table-column
+                :label="t('dateJoined')"
+                prop="dateJoined"
+                sortable
+              />
               <el-table-column :label="t('actions')">
                 <template #default="{ row }">
                   <el-button type="primary" @click="openEditModal(row)">
-                    {{ t('editUser') }}
+                    {{ t("editUser") }}
                   </el-button>
-                  <el-button type="danger" @click="confirmDeleteHandler(row.id)">
-                    {{ t('delete') }}
+                  <el-button
+                    type="danger"
+                    @click="confirmDeleteHandler(row.id)"
+                  >
+                    {{ t("delete") }}
                   </el-button>
                 </template>
               </el-table-column>
@@ -65,7 +78,11 @@
           </div>
 
           <!-- Edit User Modal -->
-          <el-dialog v-model="isEditModalVisible" :title="t('editUserModalTitle')" width="30%">
+          <el-dialog
+            v-model="isEditModalVisible"
+            :title="t('editUserModalTitle')"
+            width="30%"
+          >
             <UserForm
               v-if="selectedUser"
               :user="selectedUser"
@@ -91,13 +108,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useI18n } from 'vue-i18n'; // Import useI18n
+import { useI18n } from "vue-i18n"; // Import useI18n
 import { useUserStore } from "@/stores/userStore";
 import UserForm from "@/components/UserForm.vue"; // Import the UserForm component
 import Title from "@/components/Title.vue"; // Import the UserForm component
 import { useConfirmDelete } from "@/composables/useConfirmDelete"; // Import the composable
-import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from "element-plus";
+
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable"; // Import autoTable directly
 
 const { t } = useI18n(); // Use the Composition API
 
@@ -165,6 +184,36 @@ const confirmDeleteHandler = (userId: number) => {
     await deleteUser(userId);
   });
 };
+
+const exportToPDF = () => {
+  const doc = new jsPDF();
+
+  // Define the columns and rows for the table
+  const columns = [
+    { title: "Name", dataKey: "name" },
+    { title: "Email", dataKey: "email" },
+    { title: "Role", dataKey: "role" },
+    { title: "Status", dataKey: "status" },
+    { title: "Date Joined", dataKey: "dateJoined" },
+  ];
+
+  const rows = users.value.map((user) => ({
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    dateJoined: user.dateJoined,
+  }));
+
+  // Add the table to the PDF
+  autoTable(doc, {
+    head: [columns.map((col) => col.title)],
+    body: rows.map((row) => columns.map((col) => row[col.dataKey])),
+  });
+
+  // Save the PDF
+  doc.save("users.pdf");
+};
 </script>
 
 <style scoped lang="scss">
@@ -176,6 +225,14 @@ const confirmDeleteHandler = (userId: number) => {
   }
   &__pagination {
     margin-top: 1rem;
+  }
+  .card-header {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    &__export {
+      margin-left: auto;
+    }
   }
 }
 </style>
